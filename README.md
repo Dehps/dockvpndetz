@@ -1,64 +1,64 @@
-# opnvpndetz
+# Welcome to the opnvpndetz Repository
 
-Welcome to the opnvpndetz repository, this repository host a Dockerfile and some bash script to quickly setup an OpenVPN certs based authentication.
-This can be helpful if you wanna access to your Homelab from work or remote place.
-
+This repository hosts a Dockerfile and several Bash scripts to quickly set up an OpenVPN authentication system based on certificates. This can be helpful if you want to access your homelab from work or a remote location.
 
 ## Dockerfile
 
-The docker image is built from debian:latest, openvpn ipcalc iptables openssl net-tools zip packages are installed from official repository
-EasyRSA is installed from github because the current version for Debian is 3.1.0 the feature build-server-certificate-full isn't working in this version.
+The Docker image is built from `debian:latest`, and the packages `openvpn`, `ipcalc`, `iptables`, `openssl`, `net-tools`, and `zip` are installed from the official repository. EasyRSA is installed from GitHub because the current version available for Debian (3.1.0) does not support the `build-server-certificate-full` feature.
 
-Since you get your HomeOPVPN work i recommend you to tagged your docker image somewhere and use a Docker-compose file to run it.
+Once you have your Home OpenVPN setup working, I recommend tagging your Docker image and using a Docker Compose file to run it.
 
-### Files Folders
+## Getting Started with Docker
 
+I recommend using the Docker Compose plugin, as it is well-suited for running a VPN service. You need to set the `$OVPN_SERVER_CN` environment variable to run the container, and you must include `--cap-add=NET_ADMIN`.
 
-files
-├ ─ ─  bin
-├ ─ ─  configuration
-└ ─ ─  easyrsa
+### Basic Run Command
 
-### bin subfolders
-The "bin" folder contains binaries:easyrsa and the dockerfile entrypoint.
-
-
-
-### configuration subfolder
-
-The configuration folder contains some bashscript that are runned by the docker entrypoint and some var files (client.sh and default_vars.sh)
-
-
-  #### clients.sh
-
-  This file contains clients list and the passphrase of there private key.
-
-  #### create_server_config.sh
-
-  This script generate the OpenVPN server.conf
-
-  #### create_clients_config.sh
-
-  This script generate the OpenVPN clients-files from the clients.sh list.
-
-  #### default_vars.sh
-
-  This file contains all environment vars from the feature.
-
-  #### set_defaults.sh
-
-  This script is the first script launched by entrypoint, it controlls vars setup value and set some value to Vars Unset.
-
-  #### setup_networking.sh
-
-  This script setup network for the feature, please not that you should add the --cap-add=NET_ADMIN to VPN be working through docker host.
+```bash
+docker run --name Myopenvpn -p 1194:1194/tcp -v /PATH/TO/HOST/VOLUMES:/etc/openvpn -e "OVPN_SERVER_CN=MY.VPN.DOMAIN" --cap-add=NET_ADMIN myimage:mytag
+```
+### Run with your personal users
+```bash  
+  docker run --name Myopenvpn -p 1194:1194/tcp -v /PATH/TO/HOST/VOLUMES:/etc/openvpn -e "OVPN_SERVER_CN=MY.VPN.DOMAIN" -e "USERS=toto,bob" --cap-add=NET_ADMINmyimage:mytag
+```
+here this command will create toto and bob clients user.
   
-  #### setup_pki.sh
+## Docker-Compose
 
-  This script init the pki and build ta.key (diffie-hellman key), build ca cert, server cert and clients certs, then export client certs in /etc/pki/client-export.
+As it be a VPN service i recommend you to use docker-compose to up your container.
+See docker-compose file syntax in repo to help you.
+
+## Export clients conf
+
+In the PKI_DIR/client-export/ dir a ZIP file with client.ovpn and all files needed (cert,key,ca,ta.key and passphrase) note that the passphrase is random generatly if you wanna set your passphrase you can set your clients and passphrase in clients.sh
+
+## File and Folder Structure
 
 
-### easyrsa subfolders
+'''
+files
+│
+├───bin
+│
+├───configuration
+│
+└───easyrsa
+'''
+### Bin Subfolder
 
-The easyrsa folder contains easyrsa Vars and the easyrsa conf.
+The `bin` folder contains binaries, including `easyrsa` and the Dockerfile entrypoint.
 
+### Configuration Subfolder
+
+The `configuration` folder contains several Bash scripts that are executed by the Docker entrypoint, along with variable files (`client.sh` and `default_vars.sh`).
+
+- **clients.sh**: This file contains the list of clients and the passphrases for their private keys.
+- **create_server_config.sh**: This script generates the `OpenVPN server.conf` file.
+- **create_clients_config.sh**: This script generates the OpenVPN client configuration files from the list in `clients.sh`.
+- **default_vars.sh**: This file contains all environment variables for the feature.
+- **setup_networking.sh**: This script configures the networking for the feature. Note that you should add `--cap-add=NET_ADMIN` for the VPN to function properly in the Docker host.
+- **setup_pki.sh**: This script initializes the PKI, builds the `ta.key` (Diffie-Hellman key), generates the CA certificate, server certificate, and client certificates, then exports the client certificates to `/etc/pki/client-export`.
+
+### EasyRSA Subfolder
+
+The `easyrsa` folder contains the EasyRSA variables and configuration files.
