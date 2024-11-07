@@ -1,0 +1,48 @@
+#!/bin/bash
+
+if [ "$DEBUG" == "true" ]; then
+  set -x
+fi
+set -e
+
+CONFIGFILES="/opt/configuration"
+
+source "$CONFIGFILES/default_vars.sh"
+
+if [ -z "${OVPN_SERVER_CN }"]; then
+   echo "Error: OVPN_SERVER_CN is not set. Please provide a valid value."
+   exit 1 # EXIT With a non zero status code
+fi
+
+
+echo
+echo "$(date +'%F %T') - Setting up networking..."
+echo
+source "$CONFIGFILES/setup_networking.sh"
+
+echo
+echo "$(date +'%F %T') - Setting up PKI..."
+echo
+source "$CONFIGFILES/setup_pki.sh"
+
+echo
+echo "$(date +'%F %T') - Creating configuration files..."
+echo
+
+
+
+source "$CONFIGFILES/create_server_config.sh"
+
+
+echo
+echo "$(date +'%F %T') - Generating client config ..."
+echo
+
+source "$CONFIGFILES/create_clients_config.sh"
+
+echo
+echo "$(date +'%F %T') - Running OpenVPN..."
+echo
+
+exec openvpn --config $OVPN_DIR/server.conf
+
