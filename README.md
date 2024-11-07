@@ -1,4 +1,4 @@
-# Welcome to the opnvpndetz Repository
+# Welcome to the dockvpndetz Repository
 
 This repository hosts a Dockerfile and several Bash scripts to quickly set up an OpenVPN authentication system based on certificates. This can be helpful if you want to access your homelab from work or a remote location.
 
