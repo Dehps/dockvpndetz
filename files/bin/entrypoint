@@ -9,7 +9,7 @@ CONFIGFILES="/opt/configuration"
 
 source "$CONFIGFILES/default_vars.sh"
 
-if [ -z "${OVPN_SERVER_CN }"]; then
+if [ -z "${OVPN_SERVER_CN}" ]; then
    echo "Error: OVPN_SERVER_CN is not set. Please provide a valid value."
    exit 1 # EXIT With a non zero status code
 fi
